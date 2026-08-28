@@ -1,3 +1,8 @@
-(test
- (name test_game)
- (libraries cardmatch_lib alcotest))
+(executable
+ (name test_core)
+ (libraries core ai))
+
+(rule
+ (alias runtest)
+ (action
+  (run %{exe:test_core.exe})))
