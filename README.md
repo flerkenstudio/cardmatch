@@ -1,41 +1,69 @@
-# CardMatch
+🃏 CardMatch
+A terminal memory/concentration card game in OCaml 🎴
 
-A terminal memory / concentration card game in OCaml, built as a **functional core + imperative shell**:
+Built as a functional core + imperative shell — the way Jane Street writes real systems.
 
-- `lib/game.ml` — pure game logic (no I/O, no hidden mutation)
-- `lib/game.mli` — the module interface; `state` is abstract
-- `bin/main.ml` — the game loop, printing and stdin parsing
-- `lib/test/test_game.ml` — Alcotest unit tests
+OCaml · Dune · Alcotest
 
-## Build & run
-
-```bash
+✨ Highlights
+🧠 Pure game logic — no I/O, no hidden mutation in the core
+🔒 Abstract state — impossible to corrupt the game from outside the module
+🎲 Seeded shuffle — reproducible boards = testable randomness
+✅ Unit tested — Alcotest suite covering rules and immutability
+⚡ Total pattern matches — adding a rank is a compile error, not a runtime bug
+🚀 Build & Run
+# 1️⃣ Install dependencies
 opam install dune alcotest
+
+# 2️⃣ Build
 dune build
+
+# 3️⃣ Run tests
 dune test
+
+# 4️⃣ Play! 🎮
 dune exec bin/main.exe
-```
+🎮 How to Play
+Rule	Detail
+🎯 Goal	Match all pairs of cards
+🔢 Matching	Cards match on rank (Ace–Ten) — suits are just cosmetic 💅
+🖱️ Moves	Pick two indices per turn
+✅ Match	Pair stays revealed as **
+❌ Miss	Cards flip back to ??
+🏆 Win	All pairs found — done in the fewest attempts!
+ ??  ??  ??  ??
+ ??  A♥  ??  ??     ← one card revealed...
+ ??  ??  ??  ??
+ ??  ??  ??  ??
+🏗️ Project Structure
+cardmatch/
+├── 📁 bin/
+│   └── main.ml            🖥️  Game loop, printing, stdin parsing
+├── 📁 lib/
+│   ├── game.ml            🧠  Pure game logic (no I/O!)
+│   ├── game.mli           🔒  Module interface — state is abstract
+│   └── test/
+│       └── test_game.ml   ✅  Alcotest unit tests
+└── 📄 dune-project        ⚙️  Build config
+🎨 Design Notes
+♾️ Immutability
+reveal and play_turn never mutate their argument — they Array.copy first and return a fresh board/state. Tests assert this.
 
-## Design notes
+🔒 Abstract State
+game.mli exposes type state with no constructor, so attempts and pairs_found can only change through play_turn — they can never drift out of sync with the board. cell stays concrete so the renderer and tests can pattern match on it.
 
-- **Immutability.** `reveal` and `play_turn` never mutate their argument; they
-  `Array.copy` first and return a new board/state. Tests assert this.
-- **Abstract state.** `game.mli` exposes `type state` with no constructor, so
-  `attempts` and `pairs_found` can only change through `play_turn` and can
-  never drift out of sync with the board. `cell` stays concrete because the
-  renderer and the tests pattern match on it.
-- **Seeded shuffle.** `make_board rows cols seed` uses Fisher–Yates over a
-  `Random.State.t` built from the seed, so the same seed always gives the same
-  board — that is what makes the shuffle testable.
-- **Total pattern matches.** Every match on `cell` / `rank` / `suit` covers all
-  constructors, so adding a rank is a compile error, not a runtime bug.
+🎲 Seeded Shuffle
+make_board rows cols seed uses Fisher–Yates over a Random.State.t built from the seed → same seed = same board = testable randomness.
 
-## Rules
+⚡ Total Pattern Matches
+Every match on cell / rank / suit covers all constructors. Add a new rank? The compiler forces you to handle it everywhere. Compile-time safety > runtime bugs. 🛡️
 
-Cards match on **rank** (Ace–Ten), suits are cosmetic; each board has two copies
-of each chosen rank. Pick two indices per turn: match → `**`, miss → back to `??`.
+📚 What I Learned
+🧩 Algebraic data types & exhaustive pattern matching
+♻️ Immutable updates (functional core style)
+📦 Module design with .mli interface files
+🧪 Unit testing with Alcotest
+🔨 Real-world OCaml tooling: opam, dune
+Built while preparing for a Software Engineering internship application 💼
 
-## What I learned
-
-Algebraic data types and exhaustive pattern matching, immutable updates,
-module design with `.mli` files, and unit testing with Alcotest.
+⭐ Star this repo if you found it useful!
