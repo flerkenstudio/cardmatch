@@ -1,74 +1,576 @@
 # CardMatch 2.0
 
-A terminal memory-matching game written in OCaml, with a pure/testable
-core engine and an imperative terminal (TUI) shell.
+A terminal memory-matching game written in **OCaml**, with a pure/testable core engine and an imperative terminal (TUI) shell.
 
-## Features
-- 5 difficulty presets (Easy -> Extreme) plus custom board sizes
-- 7 game modes: Classic, Time Attack, Perfect, Blitz, Zen, Streak, Daily Challenge
-- Combo-based scoring with difficulty multipliers
-- Deterministic seeded boards (daily challenges are the same board for everyone)
-- An AI opponent with 4 memory/skill levels (Easy/Normal/Hard/Expert)
-- Local leaderboard, lifetime statistics, save & resume
-- ANSI terminal UI with keyboard navigation and 4 selectable themes
+---
 
-## Requirements
-- OCaml >= 4.14
-- dune >= 3.0
-- the `unix` findlib library (ships with the OCaml standard distribution)
+## ✨ Features
 
-No opam packages are required — everything here is written against the
-stdlib + Unix, on purpose, so it builds anywhere a bare OCaml + dune
-toolchain is available (e.g. `apt install ocaml-nox ocaml-dune` on Debian/Ubuntu).
+- 🎯 **5 difficulty presets** — Easy → Extreme
+- 🧩 **Custom board sizes**
+- 🎮 **7 game modes**
+  - Classic
+  - Time Attack
+  - Perfect
+  - Blitz
+  - Zen
+  - Streak
+  - Daily Challenge
+- 🔥 **Combo-based scoring**
+- 📈 **Difficulty multipliers**
+- 🎲 **Deterministic seeded boards**
+- 📅 **Daily Challenge** — same board for everyone
+- 🤖 **AI opponent**
+  - Easy
+  - Normal
+  - Hard
+  - Expert
+- 🏆 **Local leaderboard**
+- 📊 **Lifetime statistics**
+- 💾 **Save & resume**
+- 🎨 **4 selectable terminal themes**
+- ⌨️ **Keyboard navigation**
+- 🧪 **Pure/testable game engine**
+- ⚡ **No external runtime dependencies**
 
-## Build & run
+---
+
+# 🛠️ Requirements
+
+- **OCaml >= 4.14**
+- **Dune >= 3.0**
+- `unix` findlib library
+
+The project intentionally uses only the **OCaml standard library + Unix**.
+
+No additional opam packages are required for the application itself.
+
+This means it can be built anywhere a bare OCaml + Dune toolchain is available, such as Debian, Ubuntu, or GitHub Codespaces.
+
+---
+
+# 🚀 Quick Start — GitHub Codespaces / Ubuntu
+
+If you are running **CardMatch 2.0 inside GitHub Codespaces**, open the terminal and run the following commands.
+
+### 1. Update Ubuntu packages
+
+```bash
+sudo apt update
 ```
+
+### 2. Install OPAM
+
+```bash
+sudo apt install -y opam
+```
+
+### 3. Initialize OPAM
+
+```bash
+opam init -y
+```
+
+Load the OPAM environment:
+
+```bash
+eval $(opam env)
+```
+
+### 4. Install Dune and Alcotest
+
+```bash
+opam install -y dune alcotest
+```
+
+> **Note:** CardMatch 2.0 itself does not require external opam packages at runtime. Alcotest is included in the development setup for environments where it is used for testing or future test development.
+
+### 5. Build the project
+
+```bash
 dune build
+```
+
+### 6. Run the tests
+
+```bash
+dune test
+```
+
+### 7. Start CardMatch 2.0 🎮
+
+```bash
 dune exec bin/main.exe
 ```
 
-## Run the tests
+### ☕ Buy Me a Coffee
+
+👉 **[Support CardMatch 2.0 — Buy Me a Coffee](https://buymeacoffee.com/flerken)**
+
+Thank you for supporting open-source development! 🚀
+
+# ⚡ One-Command Setup
+
+For a fresh **GitHub Codespaces / Ubuntu** environment, you can install the development tools, build, test, and launch the game with one command:
+
+```bash
+sudo apt update && sudo apt install -y opam && opam init -y && eval $(opam env) && opam install -y dune alcotest && dune build && dune test && dune exec bin/main.exe
 ```
+
+### What this command does
+
+1. Updates the Ubuntu package list
+2. Installs OPAM
+3. Initializes OPAM
+4. Loads the OPAM environment
+5. Installs Dune and Alcotest
+6. Builds CardMatch 2.0
+7. Runs the test suite
+8. Starts the game
+
+---
+
+# 🔨 Build & Run
+
+If OCaml and Dune are already installed:
+
+```bash
+dune build
+```
+
+Run the game:
+
+```bash
+dune exec bin/main.exe
+```
+
+---
+
+# 🧪 Run Tests
+
+Run the complete test suite:
+
+```bash
 dune test
 ```
-This runs a small hand-rolled assertion suite (`lib/test/test_core.ml`)
-covering board generation/determinism, the flip/match state machine,
-scoring, the countdown timer, and the AI's memory.
 
-## Controls
-- Arrow keys — move the cursor
-- `Enter` — flip the selected card
-- `H` — use a hint (costs points, disabled in Perfect mode)
-- `P` — pause (resume / save & exit / restart / main menu)
-- `R` — restart the current board
-- `Q` — quit to the main menu
+The test suite covers:
 
-## Architecture
-```
-lib/core    - pure engine: Card, Rng, Difficulty, Board, Game_mode,
-              Timer, Scoring, Game, Statistics. Zero I/O dependencies.
-lib/ui      - terminal rendering, themes, raw-mode input, menus.
-lib/ai      - AI opponent: bounded memory with decay + mistake rate.
-lib/persist - save file, leaderboard, and stats file storage
-              (plain-text formats, no external deps).
-lib/test    - test suite.
-bin/        - the executable shell (game loop, timing, menus).
+- Board generation
+- Seed determinism
+- Flip/match state machine
+- Scoring
+- Countdown timer
+- AI memory
+- Core game behavior
+
+The tests are located under:
+
+```text
+lib/test/test_core.ml
 ```
 
-Save data, stats, and the leaderboard are stored under
-`$XDG_DATA_HOME/cardmatch` (or `~/.local/share/cardmatch` if
-`XDG_DATA_HOME` isn't set).
+---
 
-## Notes on this build
-This project was reconstructed from a multi-turn AI chat transcript that
-built it in pieces and, by its own admission mid-transcript, left several
-things broken (a syntactically invalid `hint_pair`, a `Memory` module whose
-internals `Ai_player` reached into directly despite them being abstracted
-away in `memory.mli`, a raw-mode terminal reader built around a fragile
-`stty ... </dev/tty` shell-out, a corrupted string literal in the renderer,
-an `Input.with_raw`-adjacent `unescape` that called `String.split_on_char`
-with a 2-character string instead of a `char`, and a `bin/main.ml` with
-unclosed parens and a call to an undefined placeholder function). All of
-that has been fixed here, and the result has been compiled and exercised
-end-to-end (menus, board rendering, flipping, matching, scoring) inside a
-real pseudo-terminal, plus a passing test suite, before being packaged.
+# 🎮 Controls
+
+| Key | Action |
+|---|---|
+| `Arrow Keys` | Move the cursor |
+| `Enter` | Flip the selected card |
+| `H` | Use a hint |
+| `P` | Pause |
+| `R` | Restart the current board |
+| `Q` | Quit to the main menu |
+
+### Hint
+
+Using a hint costs points.
+
+Hints are disabled in **Perfect Mode**.
+
+### Pause Menu
+
+Press `P` to open the pause menu.
+
+Available options include:
+
+- Resume
+- Save & Exit
+- Restart
+- Main Menu
+
+---
+
+# 🎮 Game Modes
+
+CardMatch 2.0 includes **7 game modes**.
+
+### Classic
+
+The standard memory-matching experience.
+
+### Time Attack
+
+Match all cards before the timer runs out.
+
+### Perfect
+
+Focus on achieving a perfect run.
+
+Hints are disabled.
+
+### Blitz
+
+A faster and more intense version of CardMatch.
+
+### Zen
+
+A relaxed mode focused on playing without pressure.
+
+### Streak
+
+Keep making successful matches to maintain your streak.
+
+### Daily Challenge
+
+Play the daily seeded board.
+
+Every player receives the same board for the challenge.
+
+---
+
+# 🤖 AI Opponent
+
+CardMatch 2.0 includes an AI opponent with four skill levels:
+
+| Level | Description |
+|---|---|
+| **Easy** | Limited memory and higher mistake rate |
+| **Normal** | Balanced memory and mistakes |
+| **Hard** | Strong memory and fewer mistakes |
+| **Expert** | Advanced memory and very low mistake rate |
+
+The AI uses:
+
+- Bounded memory
+- Memory decay
+- Configurable mistake rates
+- Multiple skill levels
+
+---
+
+# 🏆 Scoring
+
+CardMatch 2.0 uses a combo-based scoring system.
+
+Your score is affected by:
+
+- Successful matches
+- Combo streaks
+- Difficulty
+- Game mode
+- Hints
+- Mistakes
+- Overall performance
+
+Higher difficulties provide score multipliers.
+
+---
+
+# 🎲 Deterministic Boards
+
+CardMatch 2.0 supports deterministic seeded board generation.
+
+This provides:
+
+- Reproducible games
+- Testable board generation
+- Consistent Daily Challenges
+- The same Daily Challenge board for every player
+
+---
+
+# 💾 Save Data
+
+CardMatch stores local player data under:
+
+```text
+$XDG_DATA_HOME/cardmatch
+```
+
+If `XDG_DATA_HOME` is not set, it uses:
+
+```text
+~/.local/share/cardmatch
+```
+
+Stored data includes:
+
+- Save/resume information
+- Leaderboard
+- Lifetime statistics
+
+The persistence layer uses plain-text formats and has no external dependencies.
+
+---
+
+# 🏗️ Architecture
+
+```text
+CardMatch 2.0
+│
+├── lib/
+│   │
+│   ├── core/
+│   │   ├── Card
+│   │   ├── Rng
+│   │   ├── Difficulty
+│   │   ├── Board
+│   │   ├── Game_mode
+│   │   ├── Timer
+│   │   ├── Scoring
+│   │   ├── Game
+│   │   └── Statistics
+│   │
+│   ├── ui/
+│   │   ├── Terminal rendering
+│   │   ├── Themes
+│   │   ├── Raw-mode input
+│   │   └── Menus
+│   │
+│   ├── ai/
+│   │   └── AI opponent
+│   │
+│   ├── persist/
+│   │   ├── Save files
+│   │   ├── Leaderboard
+│   │   └── Statistics
+│   │
+│   └── test/
+│       └── Test suite
+│
+└── bin/
+    └── main.ml
+```
+
+### Core
+
+```text
+lib/core
+```
+
+Contains the pure game engine.
+
+The core is designed to have **zero I/O dependencies**, making it easier to test and reason about.
+
+### UI
+
+```text
+lib/ui
+```
+
+Contains:
+
+- Terminal rendering
+- Themes
+- Raw terminal input
+- Menus
+- Keyboard navigation
+
+### AI
+
+```text
+lib/ai
+```
+
+Contains the AI opponent.
+
+The AI uses:
+
+- Bounded memory
+- Memory decay
+- Configurable mistake rates
+- Multiple skill levels
+
+### Persistence
+
+```text
+lib/persist
+```
+
+Handles:
+
+- Save files
+- Leaderboards
+- Player statistics
+
+### Tests
+
+```text
+lib/test
+```
+
+Contains the test suite for the core game engine.
+
+### Executable
+
+```text
+bin/
+```
+
+Contains the main terminal application and game loop.
+
+---
+
+# 🧪 Development Workflow
+
+For normal development, use:
+
+```bash
+dune build
+```
+
+Then run tests:
+
+```bash
+dune test
+```
+
+Then launch the game:
+
+```bash
+dune exec bin/main.exe
+```
+
+A convenient development cycle is:
+
+```bash
+dune build && dune test && dune exec bin/main.exe
+```
+
+---
+
+# 🔍 Project Philosophy
+
+CardMatch 2.0 is intentionally designed around a:
+
+**Pure Core Engine + Imperative Terminal Shell**
+
+architecture.
+
+The goal is to keep game logic:
+
+- Deterministic
+- Testable
+- Reusable
+- Independent from terminal I/O
+- Easy to extend
+
+This makes it possible to add new:
+
+- Game modes
+- AI behavior
+- Scoring systems
+- Interfaces
+- Persistence features
+- Board configurations
+
+without tightly coupling everything together.
+
+---
+
+# 📝 Notes on This Build
+
+This project was reconstructed from a multi-turn AI chat transcript that built the project incrementally.
+
+During development, several issues were identified and fixed, including:
+
+- A syntactically invalid `hint_pair`
+- A `Memory` module abstraction issue accessed directly by `Ai_player`
+- A fragile raw-mode terminal reader based around `stty ... </dev/tty`
+- A corrupted string literal in the renderer
+- An invalid `String.split_on_char` call using a 2-character string instead of a `char`
+- Unclosed parentheses in `bin/main.ml`
+- A call to an undefined placeholder function
+
+These issues have been fixed.
+
+The resulting project has been:
+
+- ✅ Compiled successfully
+- ✅ Tested with the project's test suite
+- ✅ Exercised end-to-end in a real pseudo-terminal
+- ✅ Tested through menus
+- ✅ Tested through board rendering
+- ✅ Tested through card flipping
+- ✅ Tested through matching
+- ✅ Tested through scoring
+
+---
+
+# 📦 Quick Command Reference
+
+### Install environment
+
+```bash
+sudo apt update
+sudo apt install -y opam
+opam init -y
+eval $(opam env)
+opam install -y dune alcotest
+```
+
+### Build
+
+```bash
+dune build
+```
+
+### Test
+
+```bash
+dune test
+```
+
+### Run
+
+```bash
+dune exec bin/main.exe
+```
+
+### Build + Test + Run
+
+```bash
+dune build && dune test && dune exec bin/main.exe
+```
+
+### Complete fresh Ubuntu/Codespaces setup
+
+```bash
+sudo apt update && sudo apt install -y opam && opam init -y && eval $(opam env) && opam install -y dune alcotest && dune build && dune test && dune exec bin/main.exe
+```
+
+---
+
+# ☕ Support the Project
+
+If you enjoy **CardMatch 2.0** and want to support future updates, you can buy me a coffee.
+
+Your support helps keep the project alive and gives me more motivation to build new features and open-source projects. ❤️
+
+---
+
+# 📄 License
+
+See the repository license for the applicable terms.
+
+---
+
+## ❤️ CardMatch 2.0
+
+Built with **OCaml + Dune**.
+
+Designed around a clean functional core and a terminal-first gaming experience.
+
+**Made with code, coffee, and a lot of card flipping. 🃏☕**
