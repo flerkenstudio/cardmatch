@@ -103,11 +103,7 @@ dune test
 dune exec bin/main.exe
 ```
 
-### ☕ Buy Me a Coffee
-
-👉 **[Support CardMatch 2.0 — Buy Me a Coffee](https://buymeacoffee.com/flerken)**
-
-Thank you for supporting open-source development! 🚀
+---
 
 # ⚡ One-Command Setup
 
@@ -558,6 +554,12 @@ sudo apt update && sudo apt install -y opam && opam init -y && eval $(opam env) 
 If you enjoy **CardMatch 2.0** and want to support future updates, you can buy me a coffee.
 
 Your support helps keep the project alive and gives me more motivation to build new features and open-source projects. ❤️
+
+### ☕ Buy Me a Coffee
+
+👉 **[Support CardMatch 2.0 — Buy Me a Coffee](https://buymeacoffee.com/flerken)**
+
+Thank you for supporting open-source development! 🚀
 
 ---
 
